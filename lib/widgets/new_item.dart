@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopping_list/models/grocery_item.dart';
 
 import '../data/categories.dart';
 import '../models/category.dart';
@@ -28,7 +29,7 @@ class _NewItemState extends State<NewItem> {
       final response = await http.post(
         url,
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
         },
         body: json.encode(
           {
@@ -41,12 +42,20 @@ class _NewItemState extends State<NewItem> {
       debugPrint(response.body);
       debugPrint(response.statusCode.toString());
 
+      final Map<String, dynamic> resData = json.decode(response.body);
       // ignore: use_build_context_synchronously
       if (!context.mounted) {
         return;
       }
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        GroceryItem(
+          id: resData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory,
+        ),
+      );
 
       // debugPrint(_enteredName);
       // debugPrint(_enteredQuantity.toString());

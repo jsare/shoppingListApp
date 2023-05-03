@@ -31,13 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final response = await http.get(url);
     final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItem> _loadedItemList = [];
+    final List<GroceryItem> loadedItemList = [];
     for (final item in listData.entries) {
       final category = categories.entries
           .firstWhere(
               (catItem) => catItem.value.title == item.value['category'])
           .value;
-      _loadedItemList.add(
+      loadedItemList.add(
         GroceryItem(
           id: item.key,
           name: item.value['name'],
@@ -47,18 +47,22 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     setState(() {
-      _groceryItems = _loadedItemList;
+      _groceryItems = loadedItemList;
     });
   }
 
   void _addItem() async {
-    await Navigator.of(context).push<GroceryItem>(
+    final newItem = await Navigator.of(context).push<GroceryItem>(
       MaterialPageRoute(
         builder: (context) => const NewItem(),
       ),
     );
 
-    _loadItems;
+    if (newItem == null) return;
+
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   void _removeItem(GroceryItem item) {
